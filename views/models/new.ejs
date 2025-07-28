@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a new Model!</title>
+</head>
+
+<body>
+    <h1>Create a new Model!</h1>
+    <form action="/models" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" name="name" id="name" />
+
+        <label for="version">Version:</label>
+        <input type="text" name="version" id="version" />
+
+        <button type="submit">Add Model!</button>
+        <!-- views/fruits/new.ejs -->
+    <a href="/models">Back to Models</a>
+
+    </form>
+</body>
+
+</html>
