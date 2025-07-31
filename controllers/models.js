@@ -1,6 +1,6 @@
 const Model = require('../models/mlmodels');
 
-// This is the model controller for MVC routing.  This page is kept clean from comments. Please see comments in and below server.js for route logic.
+// This is the model controller for MVC routing.  This page is kept clean from comments. Please see comments in BUILDPROCESS.md for route logic.
 
 const home = async (req, res) => {
     res.render("index.ejs");
