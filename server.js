@@ -28,7 +28,7 @@ mongoose.connection.on("error", (err) => {
 
 // === Import Controller & Model ===
 const modelCtrl = require("./controllers/models");
-const Model = require("./models/mlmodels.js");
+
 
 // === Middleware ===
 app.use(express.urlencoded({ extended: false })); // Parse form data (application/x-www-form-urlencoded)
@@ -38,7 +38,8 @@ app.use(morgan("dev"));                            // Log requests to the consol
 app.use(express.static(path.join(__dirname, "public"))); // Serve static assets from /public
 
 // === Routes ===
-app.get("/", modelCtrl.home);
+app.get("/models/uuid/:uuid", modelCtrl.lookupByUUID);
+app.get("/models/name/:name", modelCtrl.lookupByName);
 app.get("/models/new", modelCtrl.newForm);
 app.post("/models", modelCtrl.create);
 app.get("/models", modelCtrl.index);
@@ -46,6 +47,8 @@ app.get("/models/:id", modelCtrl.show);
 app.delete("/models/:id", modelCtrl.destroy);
 app.get("/models/:id/edit", modelCtrl.edit);
 app.put("/models/:id", modelCtrl.update);
+app.get("/", modelCtrl.home);
+
 
 // === Start Server ===
 app.listen(3000, () => {
