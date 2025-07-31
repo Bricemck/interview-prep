@@ -1,7 +1,7 @@
 const { default: mongoose } = require('mongoose');
 const Model = require('../models/mlmodels');
 
-// This is the model controller for MVC routing.  This page is kept clean from comments. Please see comments in BUILDPROCESS.md for route logic.
+// This is the model controller for MVC routing.  With one significant exception, this page is kept clean from comments. Please see comments in BUILDPROCESS.md for more logic behind routing decisions.
 
 const home = async (req, res) => {
     res.render("index.ejs");
@@ -21,6 +21,20 @@ const index = async (req, res) => {
     res.render('models/index.ejs', { models: findModel});
 }
 
+// The show route logic was conflicting with lookupByName and lookupByUUID
+// because all three controller actions attempted to render the same `models/show.ejs` view.
+// When a model was not found (e.g., an invalid UUID or name), it would try to render
+// the view with a `null` model, leading to runtime errors like:
+// `Cannot read properties of null (reading 'name')`.
+//
+// Adding error handling to each controller helps avoid these conflicts by:
+// - Detecting when a model isn't found and returning an appropriate 404 response.
+// - Preventing attempts to render the `show.ejs` template with undefined data.
+// - Making debugging easier by surfacing meaningful messages in logs or the browser.
+//
+// This pattern keeps behavior consistent and avoids misleading template errors
+// when the real issue is simply that the model wasn't found.
+// 
 // const show = async (req, res) => {
 //     const { id } = req.params;
 //     const isMongoId = mongoose.Types.ObjectId.isValid(id);
@@ -34,7 +48,6 @@ const show = async (req, res) => {
 
     if (!readModel) {
       return res.status(404).render("errors/404.ejs", { message: "Model not found" });
-      // Or use: return res.status(404).send("Model not found");
     }
 
     res.render("models/show.ejs", { model: readModel });
@@ -67,7 +80,6 @@ const lookupByUUID = async (req, res) => {
 
     if (!readModel) {
       return res.status(404).render("errors/404.ejs", { message: "Model not found" });
-      // or: return res.status(404).send("Model not found");
     }
 
     res.render("models/show.ejs", { model: readModel });
@@ -83,7 +95,6 @@ const lookupByName = async (req, res) => {
 
     if (!readModel) {
       return res.status(404).render("errors/404.ejs", { message: "Model not found" });
-      // Or use: return res.status(404).send("Model not found");
     }
 
     res.render("models/show.ejs", { model: readModel });
