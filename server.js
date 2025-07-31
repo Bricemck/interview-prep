@@ -7,7 +7,6 @@ dotenv.config(); // Loads the environment variables from .env file
 // This is not required in the server file, 
 // Because express knows how to find this package
 const express = require('express');
-
 const mongoose = require("mongoose"); //requires package needed for connection to the database.
 
 // Connect to MongoDB using the connection string in the .env file
@@ -18,12 +17,21 @@ mongoose.connection.on("connected", () => {
     console.log(`Connected to MongoDB`);
 });
 
+// HTML form elements only support GET and POST so if we want a form delete we would have to use Middleware like Morgan.
+// In production delete would probably be hidden behind user permissions like admin privileges.
+const methodOverride = require("method-override");
+const morgan = require("morgan");
+
 const app = express();
 
 
 // Import the Model to be used in routing.
 const Model = require("./models/mlmodels.js");
+
+// Middleware
 app.use(express.urlencoded({ extended: false }));
+app.use(methodOverride("_method"));
+app.use(morgan("dev"));
 
    // GET Route
     // To serve a page, we start by adding a route in the server file.
@@ -81,8 +89,32 @@ app.use(express.urlencoded({ extended: false }));
         res.render("models/show.ejs", { model: readModel });
     });
 
+    //For fun I added the Edit & Delete routes.  I ran into a small problem with routing between Mongoose's built in Object Ids and the UUID requested.
+
+    //Delete route
+    app.delete("/models/:id", async (req, res) => {
+        await Model.findByIdAndDelete(req.params.id)
+        // res.send('this is the delete route');
+        res.redirect("/models")
+    });
+
+    //Edit route
+    app.get("/models/:id/edit", async (req, res) => {
+        const findModel = await Model.findById(req.params.id);
+        // console.log(findModel);
+        // res.send(`This is the edit route for ${findModel.name}`); 
+        res.render("models/edit.ejs", {
+            model: findModel,
+        });
+    });
+
+    app.put("/models/:id/edit", async (req, res) => {
+        await Model.findByIdAndUpdate(req.params.id, req.body);
+        res.redirect(`/models/${req.params.id}`);
+    });
 
 
 app.listen(3000, () => {
     console.log('Listening on port 3000');
 });
+

@@ -11,6 +11,10 @@
     <h3><%= model.version %></h3>
     <h3><%= model.created_at %></h3>
 
+    <form action="/models/<%=model._id%>?_method=DELETE" method="POST">
+        <button type="submit">Delete <%= model.name %></button>
+    </form>
+    <a href="/models/<%=model._id%>/edit">Edit <%= model.name %></a>
     <a href="/models/">Back to Models</a>
 </body>
 </html>
