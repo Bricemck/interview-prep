@@ -1,8 +1,17 @@
 # Server Build Explanation
 
-This document explains the development process behind setting up the server for this application. It is **not functional code** but rather a walkthrough of how the project was structured and tested incrementally.
+This document outlines my development process step by step, providing a clear walkthrough of how the server was structured, tested, and refined incrementally. It also serves as an opportunity to articulate my design philosophy and demonstrate a deeper understanding of the underlying concepts—rather than simply replicating a CRUD tutorial.
 
 ---
+
+# Design Philosophy
+
+My goal is to always deliver software that meets user needs, I'm not tied to any one foundation or framework, I want to choose the right tool for the job.
+I write clean, well-organized code, demonstrated here with descriptive naming and MVC routing, so that others can understand the code at a glance.
+Clear naming and structure allows comments to focus on the 'why' behind a line of code, rather than what it does.  Making future changes easier and more intentional.
+Finally reliability earns trust, and building that reliability starts with anticipating failure. I invest time in frequent tests and error handling to ensure my functions are delivering the proper values and to ensure my applications respond gracefully to real-world conditions.
+
+
 
 # Basic Structure of Express App
 
@@ -36,7 +45,7 @@ I have also used Curl for similar purposes.
 
 ## Environment Setup
 
-I like to use the MVC (Model-View-Controller) pattern because it helps me keep my server file free from distraction, and the individual pieces of code organized and easier to manage as the project grows. By separating the logic into Models, Views, and Controllers, I can work more efficiently and isolate problems faster.
+I like to use the MVC (Model-View-Controller) pattern because it helps me keep my server file free from distraction, and the individual pieces of code organized and easier to manage as the project grows. By separating the logic into Models, Views, and Controllers, I can work more efficiently and isolate problems faster.  Furthermore, by organizing code by function, comments can focus on why a line of code exists—rather than simply explaining what it does.
 
 const modelCtrl = require('./controllers/models');
 const dotenv = require("dotenv");
@@ -223,4 +232,32 @@ app.put("/models/:id", async (req, res) => {
 
 ---
 
+### Biggest Hurdle
+
+ The show route logic was conflicting with lookupByName and lookupByUUID
+ because all three controller actions attempted to render the same `models/show.ejs` view.
+ When a model was not found (e.g., an invalid UUID or name), it would try to render
+ the view with a `null` model, leading to runtime errors like:
+ `Cannot read properties of null (reading 'name')`.
+
+ Adding error handling to each controller helps avoid these conflicts by:
+ - Detecting when a model isn't found and returning an appropriate 404 response.
+ - Preventing attempts to render the `show.ejs` template with undefined data.
+ - Making debugging easier by surfacing meaningful messages in logs or the browser.
+
+ This pattern keeps behavior consistent and avoids misleading template errors
+ when the real issue is simply that the model wasn't found.
+ 
+ const show = async (req, res) => {
+     const { id } = req.params;
+     const isMongoId = mongoose.Types.ObjectId.isValid(id);
+     const readModel = isMongoId
+     res.render("models/show.ejs", { model: readModel });
+ };
+
 *This file documents the core server setup and routing logic for the Model Management application.*
+
+## If I had more time.
+
+Given more time, I would have loved to implement Unit Testing and build a form page for the search function.  However, I can demonstrate this functionality through Postman and a local browser, so it will serve our purposes for now.
+

@@ -1,46 +1,41 @@
-const { default: mongoose } = require('mongoose');
-const Model = require('../models/mlmodels');
+const { default: mongoose } = require('mongoose'); // Import mongoose to interact with MongoDB
+const Model = require('../models/mlmodels'); // Import Model schema for machine learning Models
 
-// This is the model controller for MVC routing.  With one significant exception, this page is kept clean from comments. Please see comments in BUILDPROCESS.md for more logic behind routing decisions.
+// The routing logic follows consistent patterns. 
+// I’ve commented the first few routes to explain the structure and reasoning. 
+// Subsequent routes are left uncommented unless they introduce new logic or need clarification.
+
 
 const home = async (req, res) => {
-    res.render("index.ejs");
-};
+  res.render("index.ejs");
+}; // Renders the homepage view (index.ejs) when a user visits the root route.
 
+// Handles form submission to create a new model in the database.  Awaits user input, then redirects to model index page.
 const create = async (req, res) => {
+  try {
     await Model.create(req.body);
     res.redirect("/models");
-};
+  } catch (err) {
+    console.error("Error in create():", err);
+    res.status(500).send("Server error");
+  }
+}; // Error handling avoids applications failing silently.  If this route fails, the console should tell me how it failed.
+
 
 const newForm = (req, res) => {
-    res.render("models/new.ejs");
-};
+  res.render("models/new.ejs");
+}; // JavaScript reserves keywords like "new" and "delete", so we use alternative names like "newForm" and "destroy" to avoid unexpected behavior.
+
 
 const index = async (req, res) => {
+  try {
     const findModel = await Model.find();
-    res.render('models/index.ejs', { models: findModel});
-}
-
-// The show route logic was conflicting with lookupByName and lookupByUUID
-// because all three controller actions attempted to render the same `models/show.ejs` view.
-// When a model was not found (e.g., an invalid UUID or name), it would try to render
-// the view with a `null` model, leading to runtime errors like:
-// `Cannot read properties of null (reading 'name')`.
-//
-// Adding error handling to each controller helps avoid these conflicts by:
-// - Detecting when a model isn't found and returning an appropriate 404 response.
-// - Preventing attempts to render the `show.ejs` template with undefined data.
-// - Making debugging easier by surfacing meaningful messages in logs or the browser.
-//
-// This pattern keeps behavior consistent and avoids misleading template errors
-// when the real issue is simply that the model wasn't found.
-// 
-// const show = async (req, res) => {
-//     const { id } = req.params;
-//     const isMongoId = mongoose.Types.ObjectId.isValid(id);
-//     const readModel = isMongoId
-//     res.render("models/show.ejs", { model: readModel });
-// };
+    res.render("models/index.ejs", { models: findModel });
+  } catch (err) {
+    console.error("Error in index():", err);
+    res.status(500).send("Server error");
+  }
+}; 
 
 const show = async (req, res) => {
   try {
@@ -58,20 +53,48 @@ const show = async (req, res) => {
 };
 
 const update = async (req, res) => {
-    await Model.findByIdAndUpdate(req.params.id, req.body);
+  try {
+    const updated = await Model.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    if (!updated) {
+      return res.status(404).render("errors/404.ejs", { message: "Model not found" });
+    }
+
     res.redirect(`/models/${req.params.id}`);
+  } catch (err) {
+    console.error("Error in update():", err);
+    res.status(500).send("Server error");
+  }
 };
 
 const edit = async (req, res) => {
+  try {
     const findModel = await Model.findById(req.params.id);
-    res.render("models/edit.ejs", {
-        model: findModel,
-    });
+
+    if (!findModel) {
+      return res.status(404).render("errors/404.ejs", { message: "Model not found" });
+    }
+
+    res.render("models/edit.ejs", { model: findModel });
+  } catch (err) {
+    console.error("Error in edit():", err);
+    res.status(500).send("Server error");
+  }
 };
 
 const destroy = async (req, res) => {
-    await Model.findByIdAndDelete(req.params.id)
-    res.redirect("/models")
+  try {
+    const deleted = await Model.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).render("errors/404.ejs", { message: "Model not found" });
+    }
+
+    res.redirect("/models");
+  } catch (err) {
+    console.error("Error in destroy():", err);
+    res.status(500).send("Server error");
+  }
 };
 
 const lookupByUUID = async (req, res) => {
@@ -84,7 +107,7 @@ const lookupByUUID = async (req, res) => {
 
     res.render("models/show.ejs", { model: readModel });
   } catch (err) {
-    console.error(err);
+    console.error("Error in lookupByUUID():", err);
     res.status(500).send("Server error");
   }
 };
@@ -103,7 +126,6 @@ const lookupByName = async (req, res) => {
     res.status(500).send("Server error");
   }
 };
-
 
 module.exports = {
   index,

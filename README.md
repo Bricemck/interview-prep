@@ -1,6 +1,7 @@
 // Hello! This is the take home practical for Brice McKeel.  
 // Thank you for considering me for a position at SAS.  
-// Installation & Setup will be at the top. An explanation of design choices will follow.
+// Installation & Setup will be at the top. A brief explanation of design choices and the tech stack will follow.
+// Please refer to BUILDPROCESS.md for a more step-by-step breakdown of my process and design choices.
 
 ## 📦 Installation & Setup
 
@@ -50,7 +51,7 @@
 
 # MEN Stack Project – Model Management App
 
-This is a full-stack JavaScript application built using the **MEN Stack**: **MongoDB**, **Express.js**, and **Node.js**. It allows basic model registration with UUIDs and timestamps. I chose the MEN stack over a Python or Go-based stack, because while Go may offer advantages in terms of performance and scalability; my background in the technologies associated with Javascript allows me to develop more efficiently, implement features with greater depth, and better demonstrate my capabilities across frontend and backend within the project's timeframe.
+This is a full-stack JavaScript application built using the **MEN Stack**: **MongoDB**, **Express.js**, and **Node.js**. It allows basic model registration with UUIDs and timestamps. I chose the MEN stack over a Python or Go-based stack, because while Go may offer advantages in terms of performance and scalability; my background in the technologies associated with Javascript allows me to better demonstrate my capabilities across frontend and backend within the project's timeframe.
 
 ---
 

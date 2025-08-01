@@ -1,5 +1,4 @@
 // This file represents a Clean server.js prioritizing readability, simplicity, and maintainability.
-// For a description of my process, and how I build to this, please see serverBuildProcess.js
 
 
 // === Load Environment Variables ===
@@ -7,27 +6,27 @@ const dotenv = require("dotenv");
 dotenv.config(); // Loads .env file contents into process.env
 
 // === Required Packages ===
-const express = require("express");
-const mongoose = require("mongoose");
-const path = require("path");
-const methodOverride = require("method-override");
-const morgan = require("morgan");
+const express = require("express"); // Minimalist framework for node.js that handles our routing, middleware, and HTTP req, res logic.
+const mongoose = require("mongoose"); // Provides schema-based models to simplify data validation, querying, and interaction with MongoDB
+const path = require("path"); // Core node.js utility that provides functions for handlign file and directory paths.
+const methodOverride = require("method-override"); // Middleware that enables PUT & Delete in clients that only support GET & POST.
+const morgan = require("morgan"); // Middleware that logs requests and responses, useful for debugging and monitoring activity.
 
 // === Express App Setup ===
-const app = express();
+const app = express(); // Initializes an express application instance. Handles routing, middleware, response logic, server communication, etc.  
 app.set("view engine", "ejs"); // Use EJS for server-side templating
 
 // === MongoDB Connection ===
-mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGODB_URI); // Connects to the MongoDB database
 mongoose.connection.on("connected", () => {
     console.log("Connected to MongoDB");
-});
+}); // Logs a message once connection is successfully established.
 mongoose.connection.on("error", (err) => {
     console.error("MongoDB connection error:", err);
-});
+}); // Throws an error if connection fails to connect to the database.
 
 // === Import Controller & Model ===
-const modelCtrl = require("./controllers/models");
+const modelCtrl = require("./controllers/models"); // Imports the model controller, which contains route handler functions for managing model-related logic.
 
 
 // === Middleware ===
@@ -38,6 +37,7 @@ app.use(morgan("dev"));                            // Log requests to the consol
 app.use(express.static(path.join(__dirname, "public"))); // Serve static assets from /public
 
 // === Routes ===
+// The routing logic follows consistent patterns. 
 app.get("/models/uuid/:uuid", modelCtrl.lookupByUUID);
 app.get("/models/name/:name", modelCtrl.lookupByName);
 app.get("/models/new", modelCtrl.newForm);
